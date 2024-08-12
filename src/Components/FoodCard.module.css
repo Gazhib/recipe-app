@@ -1,0 +1,57 @@
+.FoodCard {
+  background-color: #eef9e4;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  padding: 24px;
+}
+
+.FoodCard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+}
+
+.cardContent {
+  text-align: left;
+  height: auto;
+  min-height: 150px;
+}
+
+img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+.cardCategory {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.cardRating {
+  font-size: 18px;
+  color: #ff9800;
+  margin-bottom: 12px;
+}
+
+.cardTags {
+  display: flex;
+  gap: 8px;
+}
+
+.tag {
+  background-color: #d7f2c4;
+  color: #455a64;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
