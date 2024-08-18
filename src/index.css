@@ -1,8 +1,19 @@
 body {
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
   display: flex;
   justify-content: center;
-  height: 100vh;
+  height: 100%;
+  padding: 100px;
+  padding-top: 25px;
+}
+#root{
+  width: 100%;
+  height: 100%;
+}
+
+html{
+  height: 100%;
   box-sizing: border-box;
 }

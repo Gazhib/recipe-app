@@ -1,11 +1,11 @@
 .FoodCard {
-  background-color: #eef9e4;
   border-radius: 12px;
   width: 300px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   position: relative;
   padding: 24px;
+  transition: 0.5s;
 }
 
 .FoodCard:hover {
@@ -14,6 +14,9 @@
 }
 
 .cardContent {
+  background-color: #eef9e4;
+  border-radius: 16px;
+  padding: 10px;
   text-align: left;
   height: auto;
   min-height: 150px;

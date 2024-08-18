@@ -2,7 +2,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3rem 10%;
   gap: 50px;
   width: 100%;
 }
@@ -18,8 +17,8 @@
 }
 
 .search {
-  flex: 2;
-  flex-shrink: 2;
+  flex: 1.5;
+  flex-shrink: 1;
 }
 span{
   color: rgb(69, 69, 69);
@@ -34,9 +33,6 @@ span{
 }
 
 .router {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   flex: 1;
 }
 
@@ -61,4 +57,9 @@ span{
   transform: scale(1.1);
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
   background: linear-gradient(45deg, #78ffd6, #a8ff78);
+}
+
+a{
+  text-decoration: none;
+  color: inherit;
 }

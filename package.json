@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "devStart": "nodemon app.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.7",
@@ -29,6 +30,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
+    "nodemon": "^3.1.4",
     "vite": "^5.4.0"
   }
 }

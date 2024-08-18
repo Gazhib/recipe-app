@@ -1,25 +1,52 @@
 import styles from "./RecipesPage.module.css";
-import FoodCard from "../Components/FoodCard";
-import { getHits } from "../../API";
-import { Link, useLoaderData } from "react-router-dom";
+import { searchRecipes } from "../../API";
+import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
+import FoodList from "../Components/FoodList";
+import LoadingSpinner from "../Components/LoadingSpinner";
+
 export default function RecipesPage() {
-  const foodHits = useLoaderData();
+  const [foodList, setFoodList] = useState([]);
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search");
+
+  const { isFetching, refetch } = useQuery({
+    queryFn: () => searchRecipes(search),
+    queryKey: ["searchRecipe", search],
+    onSuccess: (recipes) => {
+      if (!search) {
+        setFoodList(recipes.recipes);
+      } else {
+        setFoodList(recipes.results);
+      }
+    },
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (!search) {
+      refetch();
+    }
+  }, [search, refetch]);
+
+  let content;
+
+  if (isFetching) {
+    content = <LoadingSpinner />;
+  }
+
+  if (!isFetching) {
+    content = <FoodList foodList={foodList} />;
+  }
+
+  if (!isFetching && foodList.length === 0 && search) {
+    content = <p>No results found for &quot;{search}&quot;</p>;
+  }
+
   return (
     <div>
-      <div className={styles.FoodCardList}>
-        {foodHits.map((food) => {
-          return (
-            <Link key={food.id} to={`${food.id}`}>
-              <FoodCard food={food} />
-            </Link>
-          );
-        })}
-      </div>
+      <div className={styles.FoodCardList}>{content}</div>
     </div>
   );
-}
-
-export async function loader() {
-  const result = await getHits();
-  return result;
 }
