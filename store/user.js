@@ -12,10 +12,10 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     getInfo(state, action) {
-      if (action.payload.username !== undefined) {
+      if (action.payload.username) {
         state.username = action.payload.username;
       }
-      if (action.payload.email !== undefined) {
+      if (action.payload.email) {
         state.email = action.payload.email;
       }
       state.accessToken = action.payload.accessToken;

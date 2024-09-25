@@ -1,6 +1,6 @@
-import styles from "./RecipesPage.module.css";
+import styles from "./Recipes.module.css";
 import { searchRecipes } from "../../API";
-import { useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import FoodList from "../Components/FoodList";
@@ -45,8 +45,14 @@ export default function RecipesPage() {
   }
 
   return (
-    <div>
-      <div className={styles.FoodCardList}>{content}</div>
-    </div>
+    <>
+      <header>
+        <NavLink to="/recipes">Website Recipes</NavLink>
+        <NavLink to="/community-recipes">Community Recipes</NavLink>
+      </header>
+      <div>
+        <div className={styles.FoodCardList}>{content}</div>
+      </div>
+    </>
   );
 }

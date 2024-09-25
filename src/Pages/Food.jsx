@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { getRecipe } from "../../API";
 import { useQuery } from "react-query";
-import styles from "./FoodPage.module.css";
+import styles from "./Food.module.css";
 import LoadingSpinner from "../Components/LoadingSpinner";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "./Error";
 export default function FoodPage() {
   const { foodId } = useParams();
   const { data, isLoading, isError, error } = useQuery({

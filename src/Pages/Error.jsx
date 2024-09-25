@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import styles from "./ErrorPage.module.css";
+import styles from "./Error.module.css";
 export default function ErrorPage({
   error = "We're sorry, but an error occurred while processing your request.",
 }) {

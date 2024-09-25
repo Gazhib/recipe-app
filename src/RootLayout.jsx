@@ -14,31 +14,37 @@ export default function RootLayout() {
     }
 
     async function refresh() {
-      const response = await fetch("http://localhost:3000/api/refresh", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: refreshToken }),
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw json({ message: "Could not fetch" }, { status: 500 });
+      try {
+        const response = await fetch("http://localhost:3000/api/refresh", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: refreshToken }),
+          method: "POST",
+        });
+        if (!response.ok) {
+          throw json({ message: "Could not fetch" }, { status: 500 });
+        }
+        const newData = await response.json();
+        console.log(newData);
+        dispatch(
+          userActions.getInfo({
+            accessToken: newData.accessToken,
+            refreshToken: newData.refreshToken,
+          })
+        );
+        const expiration = new Date();
+        expiration.setHours(expiration.getHours() + 1);
+        localStorage.setItem("expiration", expiration.toISOString());
+      } catch (err) {
+        console.log(err);
+        dispatch(userActions.clearInfo());
       }
-
-      const newData = await response.json();
-      console.log(newData)
-      dispatch(
-        userActions.getInfo({
-          accessToken: newData.accessToken,
-          refreshToken: newData.refreshToken,
-        })
-      );
     }
-    
+
     const duration = getTokenDuration();
     let timer;
     console.log(duration);
-    refresh();
 
     timer = setTimeout(() => {
       refresh();

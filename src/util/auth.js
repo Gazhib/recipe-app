@@ -1,6 +1,6 @@
 export function getTokenDuration() {
   const storedExpirationDate = localStorage.getItem("expiration");
-  if (!storedExpirationDate) {
+  if (storedExpirationDate < 0) {
     return 0;
   }
 
@@ -9,3 +9,6 @@ export function getTokenDuration() {
   const duration = expirationDate.getTime() - now.getTime();
   return duration;
 }
+
+
+

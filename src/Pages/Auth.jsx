@@ -2,25 +2,30 @@ import {
   useSearchParams,
   Link,
   useActionData,
-  redirect,
+  useNavigate,
 } from "react-router-dom";
-import styles from "./AuthPage.module.css";
+import styles from "./Auth.module.css";
 import AuthForm from "../Components/AuthForm";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { userActions } from "../../store";
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
   const isLogin = searchParams.get("mode") === "login";
+  const navigate = useNavigate();
   const data = useActionData();
   const dispatch = useDispatch();
+  const username = useSelector((state) => state.user.username);
   useEffect(() => {
-    if (data && data.success) {
-      dispatch(userActions.getInfo(data.userData));
-
-      return redirect("/");
+    if (username) {
+      navigate("/");
     }
-  }, [data, dispatch]);
+    if (data && data.success) {
+      console.log(data);
+      dispatch(userActions.getInfo(data.userData));
+      navigate("/")
+    }
+  }, [data, dispatch, username, navigate]);
   return (
     <div className={styles.AuthPage}>
       <div className={styles.authContainer}>
