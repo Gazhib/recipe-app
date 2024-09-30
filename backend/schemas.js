@@ -28,35 +28,42 @@ const refreshTokenSchema = new Schema({
 });
 
 const foodSchema = new Schema({
-  author: {
+  id: {
     type: String,
     required: true,
   },
-  recipeName: {
+  title: {
     type: String,
     required: true,
   },
-  instructions: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  ingredients: {
+  analyzedInstructions: {
     type: Array,
     of: {
       type: String,
     },
     required: true,
   },
-  readyIn: {
+  description: {
+    type: String,
+    required: true,
+  },
+  extendedIngredients: {
+    type: Array,
+    of: {
+      type: String,
+    },
+    required: true,
+  },
+  readyInMinutes: {
     type: Number,
     required: true,
   },
   servings: {
     type: Number,
+    required: true,
+  },
+  imageName: {
+    type: String,
     required: true,
   },
 });

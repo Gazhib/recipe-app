@@ -1,0 +1,13 @@
+.pictureContainer {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.photo {
+  visibility: hidden;
+  display: none;
+}
+
+.picture{
+  margin-top: 15px;
+}

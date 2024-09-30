@@ -8,15 +8,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-label {
+.NewRecipeForm label {
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
 }
 
-input[type="text"],
-input[type="number"],
-textarea {
+.NewRecipeForm input[type="text"],
+.NewRecipeForm input[type="number"],
+.NewRecipeForm textarea {
   width: 97%;
   padding: 10px;
   margin-bottom: 12px;
@@ -44,7 +44,7 @@ textarea {
   margin-bottom: 20px;
 }
 
-button {
+.NewRecipeForm button {
   padding: 8px 12px;
   background-color: #007bff;
   color: white;
@@ -55,7 +55,7 @@ button {
   transition: background-color 0.3s;
 }
 
-button:hover {
+.NewRecipeForm button:hover {
   background-color: #0056b3;
 }
 
@@ -74,3 +74,4 @@ button:hover {
 .NewRecipeForm p {
   color: red;
 }
+

@@ -3,13 +3,24 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
+const {
+  S3Client,
+  AbortMultipartUploadCommand,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
 const app = express();
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const { userSchema, foodSchema } = require("./schemas.js");
 const { refreshTokenSchema } = require("./schemas.js");
+const multer = require("multer");
 
 require("dotenv").config({ path: "../.env" });
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
@@ -17,6 +28,19 @@ app.use(express.static("public"));
 const db = process.env.DB_CONNECTION;
 const processKey = process.env.PROCESS_KEY;
 const refreshKey = process.env.REFRESH_KEY;
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketLocation = process.env.BUCKET_LOCATION;
+const accessKey = process.env.ACCESS_KEY;
+const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: accessKey,
+    secretAccessKey,
+  },
+  region: bucketLocation,
+});
 
 const User = mongoose.model("users", userSchema, "users");
 
@@ -27,6 +51,9 @@ const RefreshTokens = mongoose.model(
 );
 
 const Food = mongoose.model("foodRecipes", foodSchema, "foodRecipes");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 async function connectDatabase() {
   await mongoose.connect(db);
@@ -52,7 +79,7 @@ function verifyToken(req, res, next) {
 }
 
 function nameValidator(word) {
-  if (word.trim() === "") {
+  if (!word || word.trim() === "") {
     return false;
   }
   return true;
@@ -181,7 +208,6 @@ app.post("/api/refresh", async (req, res) => {
     if (err) {
       return err;
     }
-    console.log(refreshToken);
     await refreshTokens.deleteOne({ refreshToken });
 
     user.jti = uuidv4();
@@ -193,58 +219,104 @@ app.post("/api/refresh", async (req, res) => {
   });
 });
 
-app.post("/add-recipe", verifyToken, async (req, res) => {
-  const {
-    author,
-    name,
-    ingredients,
-    description,
-    instructions,
-    readyIn,
-    servings,
-  } = req.body;
+app.post(
+  "/add-recipe",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    const {
+      title,
+      extendedIngredients,
+      description,
+      analyzedInstructions,
+      readyInMinutes,
+      servings,
+    } = req.body;
+    const requiredFields = { title, readyInMinutes, servings };
+    console.log("req.body", req.body);
+    const imageName = uuidv4() + "-" + req.file.originalname;
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: imageName,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    });
 
-  const requiredFields = { name, instructions, readyIn, servings };
+    await s3.send(command);
 
-  for (const [key, value] of Object.entries(requiredFields)) {
-    if (!nameValidator(value)) {
-      return res
-        .status(400)
-        .json(
-          `${
-            key.charAt(0).toUpperCase() + key.slice(1)
-          } cannot be empty. Write something`
-        );
+    for (const [key, value] of Object.entries(requiredFields)) {
+      if (!nameValidator(value)) {
+        return res
+          .status(400)
+          .json(
+            `${
+              key.charAt(0).toUpperCase() + key.slice(1)
+            } cannot be empty. Write something`
+          );
+      }
     }
-  }
-  ingredients.filter((ingredient) => ingredient.trim() !== "");
-  if (ingredients.length === 0) {
-    return res.status(400).json("Add some ingredients");
-  }
+    extendedIngredients.filter((ingredient) => ingredient.trim() !== "");
+    if (extendedIngredients.length === 0) {
+      return res.status(400).json("Add some ingredients");
+    }
+    analyzedInstructions.filter((instruction) => instruction.trim() !== "");
+    if (analyzedInstructions.length === 0) {
+      return res.status(400).json("Add some instructions");
+    }
+    const newRecipe = new Food({
+      id: uuidv4(),
+      title,
+      extendedIngredients,
+      analyzedInstructions,
+      description,
+      readyInMinutes,
+      servings,
+      imageName,
+    });
 
-  const newRecipe = new Food({
-    author,
-    recipeName: name,
-    ingredients,
-    instructions,
-    description,
-    readyIn,
-    servings,
-  });
+    try {
+      console.log("2");
+      await newRecipe.save();
+    } catch (e) {
+      console.log(e);
+      return res.json(e);
+    }
 
-  try {
-    await newRecipe.save();
-  } catch (e) {
-    return res.json(e);
+    res.status(200).json("Successfully added your recipe");
   }
-
-  res.status(200).json("Successfully added your recipe");
-});
+);
 
 app.get("/get-community-recipes", async (req, res) => {
-  const recipes = await Food.find().limit(10);
-  console.log(recipes);
+  const recipes = await Food.find().limit(10).lean();
+
+  for (const recipe of recipes) {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: recipe.imageName,
+    });
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    recipe.image = url;
+  }
   return res.status(200).json(recipes);
+});
+
+app.post("/get-community-recipe", async (req, res) => {
+  const { food } = req.body;
+  const foodId = food.id;
+  const recipeDocument = await Food.findOne({ id: foodId });
+  if (!recipeDocument) {
+    return res.status(500).json("Not Found");
+  }
+
+  const recipe = recipeDocument.toObject();
+  const command = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: recipe.imageName,
+  });
+  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+  recipe.image = url;
+  console.log(recipe);
+  return res.status(200).json(recipe);
 });
 
 app.listen(3000, () => {

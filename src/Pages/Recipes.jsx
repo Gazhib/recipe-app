@@ -1,34 +1,39 @@
 import styles from "./Recipes.module.css";
 import { searchRecipes } from "../../API";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { NavLink, useMatch, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import FoodList from "../Components/FoodList";
 import LoadingSpinner from "../Components/LoadingSpinner";
+import getFood from "../util/FoodDb";
 
 export default function RecipesPage() {
   const [foodList, setFoodList] = useState([]);
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search");
-
+  const isRecipes = useMatch("/recipes") !== null;
   const { isFetching, refetch } = useQuery({
-    queryFn: () => searchRecipes(search),
-    queryKey: ["searchRecipe", search],
-    onSuccess: (recipes) => {
-      if (!search) {
-        setFoodList(recipes.recipes);
+    queryFn: !isRecipes ? () => getFood() : () => searchRecipes(search),
+    queryKey: [isRecipes, search],
+    onSuccess: (data) => {
+      if (isRecipes) {
+        if (!search) {
+          setFoodList(data.recipes);
+        } else {
+          setFoodList(data.results);
+        }
       } else {
-        setFoodList(recipes.results);
+        setFoodList(data.recipes);
       }
     },
     staleTime: Infinity,
   });
 
   useEffect(() => {
-    if (!search) {
+    if (!search || !isRecipes) {
       refetch();
     }
-  }, [search, refetch]);
+  }, [search, refetch, isRecipes]);
 
   let content;
 
@@ -40,12 +45,12 @@ export default function RecipesPage() {
     content = <FoodList foodList={foodList} />;
   }
 
-  if (!isFetching && foodList.length === 0 && search) {
+  if (isRecipes && !isFetching && foodList.length === 0 && search) {
     content = <p>No results found for &quot;{search}&quot;</p>;
   }
 
   return (
-    <>
+    <div className={styles.RecipesPage}>
       <header>
         <NavLink to="/recipes">Website Recipes</NavLink>
         <NavLink to="/community-recipes">Community Recipes</NavLink>
@@ -53,6 +58,6 @@ export default function RecipesPage() {
       <div>
         <div className={styles.FoodCardList}>{content}</div>
       </div>
-    </>
+    </div>
   );
 }

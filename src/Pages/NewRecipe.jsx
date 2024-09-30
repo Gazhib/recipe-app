@@ -7,32 +7,13 @@ export default function NewRecipePage() {
 
 export async function action({ request }) {
   const fd = await request.formData();
-
-  const ingredients = fd.getAll("ingredients");
-  const name = fd.get("name");
-  const description = fd.get("description");
-  const instructions = fd.get("instructions");
-  const readyIn = fd.get("readyIn");
-  const servings = fd.get("servings");
   const state = store.getState();
   const accessToken = state.user.accessToken;
-  const author = state.user.username;
-  const data = {
-    author,
-    name,
-    ingredients,
-    description,
-    instructions,
-    readyIn,
-    servings,
-  };
-
   try {
     const response = await fetch("http://localhost:3000/add-recipe", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: fd,
       headers: {
-        "Content-Type": "application/json",
         authorization: `Bearer ${accessToken}`,
       },
     });

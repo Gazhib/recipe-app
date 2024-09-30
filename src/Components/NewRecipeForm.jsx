@@ -1,74 +1,97 @@
 import { Form, useActionData, useNavigation } from "react-router-dom";
 import styles from "./NewRecipeForm.module.css";
 import { useState } from "react";
+import ImagePicker from "./ImagePicker";
 export default function NewRecipeForm() {
   const [ingredients, setIngredients] = useState(["", "", ""]);
-  const [errorText, setErrorText] = useState("");
+  const [instructions, setInstructions] = useState(["", "", ""]);
+  const [ingredientErrorText, setIngredientErrorText] = useState("");
+  const [instructionErrorText, setInstructionErrorText] = useState("");
   const navigation = useNavigation();
   const error = useActionData();
   const isSubmitting = navigation.state === "submitting";
 
-  function changeIngredients(cur_index, cur_value) {
-    setIngredients((prevIngredients) => {
-      return prevIngredients.map((value, index) => {
-        if (index === cur_index) {
-          return cur_value;
-        }
-        return value;
+  function changeSomething(cur_index, cur_value, type = "ingredient") {
+    if (type === "ingredient") {
+      setIngredients((prevIngredients) => {
+        return prevIngredients.map((value, index) => {
+          if (index === cur_index) {
+            return cur_value;
+          }
+          return value;
+        });
       });
-    });
-  }
-
-  function removeIngredient(cur_index) {
-    if (ingredients.length === 1) {
-      setErrorText("Have at least 1 ingredient");
-      return;
+    } else {
+      setInstructions((prevInstructions) => {
+        return prevInstructions.map((value, index) => {
+          if (index === cur_index) {
+            return cur_value;
+          }
+          return value;
+        });
+      });
     }
-    setIngredients((prevIngredients) => {
-      return prevIngredients.filter((value, index) => index !== cur_index);
-    });
   }
 
-  function addIngredient() {
-    setIngredients((prevIngredients) => {
-      return [...prevIngredients, ""];
-    });
-    setErrorText("");
+  function removeSomething(cur_index, type = "ingredient") {
+    if (type === "ingredient") {
+      if (ingredients.length === 1) {
+        setIngredientErrorText("Have at least 1 ingredient");
+        return;
+      }
+      setIngredients((prevIngredients) => {
+        return prevIngredients.filter((value, index) => index !== cur_index);
+      });
+    } else {
+      if (instructions.length === 1) {
+        setInstructionErrorText("Have at least 1 instruction");
+        return;
+      }
+      setInstructions((prevInstructions) => {
+        return prevInstructions.filter((value, index) => index !== cur_index);
+      });
+    }
+  }
+
+  function addSomething(type = "ingredient") {
+    if (type === "ingredient") {
+      setIngredients((prevIngredients) => [...prevIngredients, ""]);
+      setIngredientErrorText("");
+    } else {
+      setInstructions((prevInstructions) => [...prevInstructions, ""]);
+      setInstructionErrorText("");
+    }
   }
 
   return (
     <div className={styles.NewRecipeForm}>
-      <Form method="post">
+      <Form method="post" encType="multipart/form-data">
         <label>Name of the Recipe</label>
-        <input className={styles.name} type="text" required name="name"></input>
+        <input className={styles.name} type="text" name="title" />
         <label>Description of the recipe</label>
         <textarea
           className={styles.description}
           type="text"
-          required
           name="description"
         ></textarea>
         <label>Instructions</label>
-        <textarea
-          className={styles.instructions}
-          type="text"
-          required
-          name="instructions"
-        ></textarea>
-        <label>Ingredients</label>
-        {errorText && <p>{errorText}</p>}
-        {ingredients.map((ingredient, index) => {
+        {instructionErrorText && <p>{instructionErrorText}</p>}
+        {instructions.map((instructions, index) => {
           return (
             <div key={index} className={styles.ingredientsContainer}>
               <input
-                value={ingredient}
+                value={instructions}
                 className={styles.ingredients}
                 type="text"
-                required
-                name="ingredients"
-                onChange={(e) => changeIngredients(index, e.target.value)}
-              ></input>
-              <button type="button" onClick={() => removeIngredient(index)}>
+                name="analyzedInstructions"
+                onChange={(e) =>
+                  changeSomething(index, e.target.value, "instruction")
+                }
+              />
+              <button
+                type="button"
+                onClick={() => removeSomething(index, "instruction")}
+              >
                 <i className="bi bi-trash"></i>
               </button>
             </div>
@@ -77,7 +100,32 @@ export default function NewRecipeForm() {
         <button
           className={styles.addButton}
           type="button"
-          onClick={addIngredient}
+          onClick={() => addSomething("instruction")}
+        >
+          Add Instruction
+        </button>
+        <label>Ingredients</label>
+        {ingredientErrorText && <p>{ingredientErrorText}</p>}
+        {ingredients.map((ingredient, index) => {
+          return (
+            <div key={index} className={styles.ingredientsContainer}>
+              <input
+                value={ingredient}
+                className={styles.ingredients}
+                type="text"
+                name="extendedIngredients"
+                onChange={(e) => changeSomething(index, e.target.value)}
+              />
+              <button type="button" onClick={() => removeSomething(index)}>
+                <i className="bi bi-trash"></i>
+              </button>
+            </div>
+          );
+        })}
+        <button
+          className={styles.addButton}
+          type="button"
+          onClick={() => addSomething()}
         >
           Add Ingredient
         </button>
@@ -85,18 +133,17 @@ export default function NewRecipeForm() {
         <input
           className={styles.readyIn}
           type="number"
-          required
-          name="readyIn"
+          name="readyInMinutes"
           min={0}
-        ></input>
+        />
         <label>Servings</label>
         <input
           className={styles.servings}
           type="number"
-          required
           name="servings"
           min={1}
-        ></input>
+        />
+        <ImagePicker />
         <button disabled={isSubmitting} className={styles.submitButton}>
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>

@@ -34,8 +34,8 @@ export default function AuthPage() {
             <h1>Enter your info to Log In</h1>
             <h2>
               {isLogin
-                ? "You still got no bitches?"
-                : "You already got bitches?"}{" "}
+                ? "Do you still have no account?"
+                : "Do you already have an account?"}{" "}
               <Link to={isLogin ? "/auth?mode=signup" : "/auth?mode=login"}>
                 {isLogin ? "Sign Up" : "Log In"}
               </Link>
