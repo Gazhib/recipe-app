@@ -21,14 +21,13 @@ export default function FoodPage() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey,
     queryFn,
+    staleTime: Infinity,
   });
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  if (!isLoading) {
-    console.log(data.analyzedInstructions);
-  }
+
+  console.log(data);
 
   if (isError) {
     return <ErrorPage error={error} />;
@@ -63,12 +62,14 @@ export default function FoodPage() {
           <div className={styles.analyzedInstructions}>
             <h2>Instructions:</h2>
             <ul>
-              {data.analyzedInstructions.map((outer, index) => (
+              {data.analyzedInstructions.map((instruction, index) => (
                 <li key={index}>
-                  <h3>{outer.name || outer}</h3>
+                  <h3>
+                    {!isCommunityRecipes ? instruction.name : instruction}
+                  </h3>
                   <ul>
                     {!isCommunityRecipes &&
-                      outer.steps.map((step, stepIndex) => (
+                      instruction.steps.map((step, stepIndex) => (
                         <li key={stepIndex}>{step.step}</li>
                       ))}
                   </ul>

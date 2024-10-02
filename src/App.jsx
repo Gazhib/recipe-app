@@ -11,7 +11,7 @@ import { Provider } from "react-redux";
 import { store, persistor } from "../store";
 import { PersistGate } from "redux-persist/integration/react";
 import NewRecipePage, { action as newRecipeAction } from "./Pages/NewRecipe";
-import AccountPage from "./Pages/Account";
+import AccountPage, { loader as infoLoader } from "./Pages/Account";
 export default function App() {
   const queryClient = new QueryClient();
 
@@ -34,15 +34,14 @@ export default function App() {
           path: "/recipes/:foodId",
           element: <FoodPage />,
         },
-
-        {
-          path: "/recipes/new-recipe",
-          element: <NewRecipePage />,
-          action: newRecipeAction,
-        },
         {
           path: "/community-recipes",
           element: <RecipesPage />,
+        },
+        {
+          path: "/community-recipes/new-recipe",
+          element: <NewRecipePage />,
+          action: newRecipeAction,
         },
         {
           path: "/community-recipes/:foodId",
@@ -56,6 +55,7 @@ export default function App() {
         {
           path: "/account/:username",
           element: <AccountPage />,
+          loader: infoLoader,
         },
       ],
     },

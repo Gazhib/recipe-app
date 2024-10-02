@@ -4,7 +4,6 @@ export default async function getFood() {
     const responseData = await response.json();
     return { recipes: responseData };
   } catch (e) {
-    console.log(e);
     throw new Error();
   }
 }
@@ -19,9 +18,8 @@ export async function getCommunityRecipe(foodId) {
       body: JSON.stringify({ food: foodId }),
     });
     const responseData = await response.json();
-    console.log(responseData);
     return responseData;
   } catch (e) {
-    console.log(e);
+    throw new Error();
   }
 }

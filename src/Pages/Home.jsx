@@ -1,8 +1,5 @@
-import { useSelector } from "react-redux";
 import styles from "./Home.module.css";
 export default function HomePage() {
-  const userData = useSelector((state) => state.user);
-  console.log(userData);
   return (
     <div className={styles.HomePage}>
       <p>

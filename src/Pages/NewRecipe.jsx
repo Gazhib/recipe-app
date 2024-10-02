@@ -1,13 +1,26 @@
 import NewRecipeForm from "../Components/NewRecipeForm";
 import { store, userActions } from "../../store";
-import { redirect } from "react-router";
+import { redirect, useNavigate } from "react-router";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 export default function NewRecipePage() {
+  const info = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!info.username) {
+      navigate("/");
+      return;
+    }
+  });
   return <NewRecipeForm />;
 }
 
 export async function action({ request }) {
   const fd = await request.formData();
+
   const state = store.getState();
+  const author = state.user.username;
+  fd.append("author", author);
   const accessToken = state.user.accessToken;
   try {
     const response = await fetch("http://localhost:3000/add-recipe", {
@@ -28,5 +41,5 @@ export async function action({ request }) {
     return new Error(e);
   }
 
-  return redirect("/recipes");
+  return redirect("/community-recipes");
 }

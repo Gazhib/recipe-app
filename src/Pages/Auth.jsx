@@ -21,9 +21,8 @@ export default function AuthPage() {
       navigate("/");
     }
     if (data && data.success) {
-      console.log(data);
       dispatch(userActions.getInfo(data.userData));
-      navigate("/")
+      navigate("/");
     }
   }, [data, dispatch, username, navigate]);
   return (

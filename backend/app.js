@@ -150,7 +150,7 @@ app.post("/api/registration", async (req, res) => {
     return res.status(409).json("The email is already registered");
   }
 
-  if (user.trim() === "") {
+  if (username.trim() === "") {
     return res.status(400).json("Username can not be empty");
   }
   if (password.trim() === "" || password.trim() !== password) {
@@ -225,6 +225,7 @@ app.post(
   upload.single("image"),
   async (req, res) => {
     const {
+      author,
       title,
       extendedIngredients,
       description,
@@ -233,7 +234,6 @@ app.post(
       servings,
     } = req.body;
     const requiredFields = { title, readyInMinutes, servings };
-    console.log("req.body", req.body);
     const imageName = uuidv4() + "-" + req.file.originalname;
     const command = new PutObjectCommand({
       Bucket: bucketName,
@@ -263,8 +263,10 @@ app.post(
     if (analyzedInstructions.length === 0) {
       return res.status(400).json("Add some instructions");
     }
+
+    const newId = uuidv4();
     const newRecipe = new Food({
-      id: uuidv4(),
+      id: newId,
       title,
       extendedIngredients,
       analyzedInstructions,
@@ -274,11 +276,13 @@ app.post(
       imageName,
     });
 
+    const user = await User.findOne({ username: author });
+
     try {
-      console.log("2");
       await newRecipe.save();
+      user.recipes.push({ title, newId, imageName });
+      await user.save();
     } catch (e) {
-      console.log(e);
       return res.json(e);
     }
 
@@ -315,8 +319,32 @@ app.post("/get-community-recipe", async (req, res) => {
   });
   const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
   recipe.image = url;
-  console.log(recipe);
   return res.status(200).json(recipe);
+});
+
+app.post("/get-user-information", async (req, res) => {
+  const { username } = req.body;
+  const user = await User.findOne({ username }).lean();
+
+  if (!user) {
+    return res.status(400).json("No user like that");
+  }
+
+  const recipes = user.recipes;
+  for (const recipe of recipes) {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: recipe.imageName,
+    });
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    recipe.url = url;
+  }
+
+  const data = {
+    recipes: recipes,
+    username: user.username,
+  };
+  return res.status(200).json(data);
 });
 
 app.listen(3000, () => {

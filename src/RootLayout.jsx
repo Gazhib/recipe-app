@@ -26,7 +26,6 @@ export default function RootLayout() {
           throw json({ message: "Could not fetch" }, { status: 500 });
         }
         const newData = await response.json();
-        console.log(newData);
         dispatch(
           userActions.getInfo({
             accessToken: newData.accessToken,
@@ -37,14 +36,12 @@ export default function RootLayout() {
         expiration.setHours(expiration.getHours() + 1);
         localStorage.setItem("expiration", expiration.toISOString());
       } catch (err) {
-        console.log(err);
         dispatch(userActions.clearInfo());
       }
     }
 
     const duration = getTokenDuration();
     let timer;
-    console.log(duration);
 
     timer = setTimeout(() => {
       refresh();
