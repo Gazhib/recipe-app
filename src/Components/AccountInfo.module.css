@@ -38,6 +38,7 @@
   margin-bottom: 2rem;
   text-align: center;
 }
+
 .personalRecipes h2 {
   margin-bottom: 1.5rem;
   color: #333;
@@ -166,4 +167,19 @@
 .addRecipeButton:focus {
   outline: 2px solid #27ae60;
   outline-offset: 2px;
+}
+
+.photoContainer button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.photoContainer button:hover {
+  background-color: #2980b9;
 }

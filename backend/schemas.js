@@ -18,6 +18,9 @@ const userSchema = new Schema({
     type: Array,
     default: [],
   },
+  imageName: {
+    type: String,
+  },
 });
 
 const refreshTokenSchema = new Schema({

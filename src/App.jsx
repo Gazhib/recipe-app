@@ -11,7 +11,10 @@ import { Provider } from "react-redux";
 import { store, persistor } from "../store";
 import { PersistGate } from "redux-persist/integration/react";
 import NewRecipePage, { action as newRecipeAction } from "./Pages/NewRecipe";
-import AccountPage, { loader as infoLoader } from "./Pages/Account";
+import AccountPage, {
+  loader as infoLoader,
+  action as infoAction,
+} from "./Pages/Account";
 export default function App() {
   const queryClient = new QueryClient();
 
@@ -56,6 +59,7 @@ export default function App() {
           path: "/account/:username",
           element: <AccountPage />,
           loader: infoLoader,
+          action: infoAction,
         },
       ],
     },

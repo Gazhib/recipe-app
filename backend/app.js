@@ -146,8 +146,13 @@ app.post("/api/registration", async (req, res) => {
   }
 
   const user = await User.findOne({ email });
+  const usernameChecker = await User.findOne({ username });
   if (user) {
     return res.status(409).json("The email is already registered");
+  }
+
+  if (usernameChecker) {
+    return res.status(409).json("The username is already registered");
   }
 
   if (username.trim() === "") {
@@ -339,12 +344,46 @@ app.post("/get-user-information", async (req, res) => {
     const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
     recipe.url = url;
   }
+  let userAvatar = "";
+  if (user.imageName) {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: user.imageName,
+    });
+    userAvatar = await getSignedUrl(s3, command, { expiresIn: 3600 });
+  }
 
   const data = {
     recipes: recipes,
     username: user.username,
+    image: userAvatar,
   };
   return res.status(200).json(data);
+});
+
+app.post("/upload-photo", upload.single("image"), async (req, res) => {
+  const { username } = req.body;
+  const imageName = uuidv4() + "-" + req.file.originalname;
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: imageName,
+    Body: req.file.buffer,
+    ContentType: req.file.mimetype,
+  });
+
+  try {
+    await s3.send(command);
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json("No user like that");
+    }
+    user.imageName = imageName;
+    await user.save();
+  } catch (e) {
+    return res.status(400).json(e);
+  }
+  return res.status(200).json("Picture uploaded successfully");
 });
 
 app.listen(3000, () => {

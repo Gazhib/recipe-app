@@ -27,8 +27,6 @@ export default function FoodPage() {
     return <LoadingSpinner />;
   }
 
-  console.log(data);
-
   if (isError) {
     return <ErrorPage error={error} />;
   }

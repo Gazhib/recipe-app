@@ -1,13 +1,31 @@
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
+import {
+  Form,
+  Link,
+  redirect,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+  useParams,
+} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { userActions } from "../../store";
 import { useEffect, useState } from "react";
 import styles from "./AccountInfo.module.css";
+import ImagePicker from "./ImagePicker";
 export default function AccountInfo() {
   const data = useLoaderData();
+  const params = useParams();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (data.username !== params.username) {
+      navigate(`/account/${data.username}`);
+      return;
+    }
+  }, [data.username, params.username, navigate]);
   const PERSONAL_RECIPES = data.recipes || [];
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
   const [isPressed, setIsPressed] = useState(false);
   const info = useSelector((state) => state.user);
   useEffect(() => {
@@ -16,6 +34,7 @@ export default function AccountInfo() {
       return;
     }
   }, [info, navigate]);
+
   async function handleLogout() {
     setIsPressed(true);
     const response = await fetch("http://localhost:3000/api/logout", {
@@ -35,13 +54,20 @@ export default function AccountInfo() {
   }
   return (
     <>
-      {" "}
       <section className={styles.personalInfo}>
-        <img className={styles.profileImage} />
         <h2>Personal Information</h2>
-        <p>
+        <img className={styles.profileImage} src={data.image} />
+        <Form
+          method="post"
+          encType="multipart/form-data"
+          className={styles.photoContainer}
+        >
           <strong>Username:</strong> {data.username}
-        </p>
+          <ImagePicker />
+          <button disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save"}
+          </button>
+        </Form>
       </section>
       <section className={styles.personalRecipes}>
         <h2>My Personal Recipes:</h2>
