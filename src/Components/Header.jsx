@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 export default function Header() {
   const searchRef = useRef();
   const navigate = useNavigate();
@@ -10,7 +11,8 @@ export default function Header() {
     const searched = searchRef.current.value;
     navigate(`/recipes?search=${searched}`);
   }
-
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search"));
   const info = useSelector((state) => state.user);
 
   return (
@@ -26,8 +28,10 @@ export default function Header() {
         <h1>
           <form onSubmit={handleSearch}>
             <input
+              onChange={(e) => setSearch(e.target.value)}
               ref={searchRef}
               placeholder="Search for recipes..."
+              value={search}
               type="text"
             />
           </form>
