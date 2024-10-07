@@ -1,1 +1,3 @@
-print(13^10^13)
+sentence1 = "My name is Batyr"
+
+print(list(sentence1.split()))
