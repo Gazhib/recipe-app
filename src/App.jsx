@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, createHashRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./Pages/Home";
 import "./index.css";
 import RecipesPage from "./Pages/Recipes";
@@ -18,7 +18,7 @@ import AccountPage, {
 export default function App() {
   const queryClient = new QueryClient();
 
-  const router = createBrowserRouter([
+  const router = createHashRouter([
     {
       path: "/",
       element: <RootLayout />,

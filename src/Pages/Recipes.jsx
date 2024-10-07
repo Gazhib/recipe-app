@@ -30,7 +30,7 @@ export default function RecipesPage() {
   });
 
   useEffect(() => {
-    if (!search || !isRecipes) {
+    if (search || !isRecipes) {
       refetch();
     }
   }, [search, refetch, isRecipes]);
