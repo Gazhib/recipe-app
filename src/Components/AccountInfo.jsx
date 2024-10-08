@@ -1,7 +1,6 @@
 import {
   Form,
   Link,
-  redirect,
   useLoaderData,
   useNavigate,
   useNavigation,
@@ -28,6 +27,7 @@ export default function AccountInfo() {
   const isSubmitting = navigation.state === "submitting";
   const [isPressed, setIsPressed] = useState(false);
   const info = useSelector((state) => state.user);
+  const api_base_url = import.meta.env.VITE_APP_API_BASE_URL;
   useEffect(() => {
     if (!info.username) {
       navigate("/");
@@ -37,7 +37,7 @@ export default function AccountInfo() {
 
   async function handleLogout() {
     setIsPressed(true);
-    const response = await fetch("http://localhost:3000/api/logout", {
+    const response = await fetch(`${api_base_url}/api/logout`, {
       method: "POST",
       body: JSON.stringify({
         token: info.refreshToken,

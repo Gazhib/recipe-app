@@ -22,8 +22,9 @@ export async function action({ request }) {
   const author = state.user.username;
   fd.append("author", author);
   const accessToken = state.user.accessToken;
+  const api_base_url = import.meta.env.VITE_APP_API_BASE_URL;
   try {
-    const response = await fetch("http://localhost:3000/add-recipe", {
+    const response = await fetch(`${api_base_url}/add-recipe`, {
       method: "POST",
       body: fd,
       headers: {

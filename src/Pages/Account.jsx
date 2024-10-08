@@ -11,10 +11,12 @@ export default function AccountPage() {
   );
 }
 
+const api_base_url = import.meta.env.VITE_APP_API_BASE_URL;
 export async function loader() {
   const state = store.getState();
   const username = state.user.username;
-  const response = await fetch("http://localhost:3000/get-user-information", {
+
+  const response = await fetch(`${api_base_url}/get-user-information`, {
     method: "POST",
     body: JSON.stringify({ username: username }),
     headers: {
@@ -31,11 +33,10 @@ export async function loader() {
 
 export async function action({ request }) {
   const fd = await request.formData();
-  console.log(fd);
   const state = store.getState();
   const username = state.user.username;
   fd.append("username", username);
-  const response = await fetch("http://localhost:3000/upload-photo", {
+  const response = await fetch(`${api_base_url}/upload-photo`, {
     method: "POST",
     body: fd,
   });

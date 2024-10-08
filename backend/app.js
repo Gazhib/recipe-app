@@ -20,7 +20,7 @@ const { refreshTokenSchema } = require("./schemas.js");
 const multer = require("multer");
 
 require("dotenv").config({ path: "../.env" });
-
+const allowedOrigins = ["https://gazhib.github.io", "http://localhost:5173"];
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));

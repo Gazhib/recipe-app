@@ -57,6 +57,7 @@ export default function AuthPage() {
     </div>
   );
 }
+const api_base_url = import.meta.env.VITE_APP_API_BASE_URL;
 
 export async function action({ request }) {
   const searchParams = new URL(request.url).searchParams;
@@ -76,8 +77,7 @@ export async function action({ request }) {
       confirmPassword: fd.get("confirmPassword"),
     };
   }
-
-  let url = "http://localhost:3000/api/";
+  let url = `${api_base_url}/api/`;
 
   const response = await fetch(`${url}${isLogin ? "login" : "registration"}`, {
     method: "POST",
