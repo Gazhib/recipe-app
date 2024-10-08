@@ -26,8 +26,79 @@ export default function AccountInfo() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const [isPressed, setIsPressed] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [errorText, setErrorText] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const info = useSelector((state) => state.user);
   const api_base_url = import.meta.env.VITE_APP_API_BASE_URL;
+
+  let content;
+
+  async function deleteRecipe(id, username) {
+    setIsDeleting(true);
+    setDeletingId(id);
+    const response = await fetch(`${api_base_url}/delete-recipe`, {
+      method: "POST",
+      body: JSON.stringify({ id, username }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      window.location.reload();
+    } else {
+      setErrorText("Something went wrong... Could not delete.");
+    }
+  }
+
+  if (isEdit) {
+    content = (
+      <>
+        {PERSONAL_RECIPES.length === 0 ? (
+          "No personal recipes yet, but you can add one"
+        ) : (
+          <ul>
+            {PERSONAL_RECIPES.map((recipe) => (
+              <li key={recipe.newId}>
+                <Link to={`/community-recipes/${recipe.newId}`}>
+                  <p>{recipe.title}</p>
+                  <img src={recipe.url} />
+                </Link>
+                <button
+                  onClick={() => deleteRecipe(recipe.newId, data.username)}
+                >
+                  {isDeleting && deletingId === recipe.newId
+                    ? "Deleting..."
+                    : "Delete"}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    );
+  } else {
+    content = (
+      <>
+        {PERSONAL_RECIPES.length === 0 ? (
+          "No personal recipes yet, but you can add one"
+        ) : (
+          <ul>
+            {PERSONAL_RECIPES.map((recipe, index) => (
+              <li key={index}>
+                <Link to={`/community-recipes/${recipe.newId}`}>
+                  <p>{recipe.title}</p>
+                  <img src={recipe.url} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    );
+  }
+
   useEffect(() => {
     if (!info.username) {
       navigate("/");
@@ -70,20 +141,22 @@ export default function AccountInfo() {
         </Form>
       </section>
       <section className={styles.personalRecipes}>
+        <button
+          className={styles.editButton}
+          onClick={() =>
+            setIsEdit((prevIsEdit) => {
+              return !prevIsEdit;
+            })
+          }
+        >
+          {isEdit ? "Stop editing" : "Edit"}
+        </button>
         <h2>My Personal Recipes:</h2>
+        <h3 className={styles.errorText}>{errorText}</h3>
         {PERSONAL_RECIPES.length === 0 ? (
           "No personal recipes yet, but you can add one"
         ) : (
-          <ul>
-            {PERSONAL_RECIPES.map((recipe, index) => (
-              <li key={index}>
-                <Link to={`/community-recipes/${recipe.newId}`}>
-                  <p>{recipe.title}</p>
-                  <img src={recipe.url} />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <ul>{content}</ul>
         )}
         <Link
           to={"/community-recipes/new-recipe"}

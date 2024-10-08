@@ -10,10 +10,10 @@ export default async function searchCommunityFood(search) {
         `${api_base_url}/search-community-recipes?query=${search}`,
         {
           method: "POST",
-          body: JSON.stringify({ search }),
         }
       );
       const responseData = await response.json();
+      console.log(responseData);
       return { recipes: responseData };
     }
   } catch (e) {

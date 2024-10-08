@@ -313,7 +313,10 @@ app.get("/get-community-recipes", async (req, res) => {
 });
 app.post("/search-community-recipes", async (req, res) => {
   const name = req.query.query;
-  const recipes = await Food.find({ title: name }).limit(10).lean();
+  console.log(name);
+  const recipes = await Food.find({ title: { $regex: name, $options: "i" } })
+    .limit(10)
+    .lean();
 
   for (const recipe of recipes) {
     const command = new GetObjectCommand({
@@ -402,6 +405,24 @@ app.post("/upload-photo", upload.single("image"), async (req, res) => {
   }
   return res.status(200).json("Picture uploaded successfully");
 });
+
+app.post("/delete-recipe", async (req, res) => {
+  const { id, username } = req.body;
+  const recipeDocument = await Food.deleteOne({ id });
+  const userDocument = await User.findOne({ username });
+  if (!userDocument) {
+    return res.status(400).json("Something went wrong...");
+  }
+  const updatedUserDocument = await User.updateOne(
+    { username },
+    { $pull: { recipes: { newId: id } } }
+  );
+  if (updatedUserDocument.modifiedCount === 0) {
+    return res.status(400).json("Recipe not found or not deleted.");
+  }
+  res.status(200).json("Recipe deleted successfully.");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);
