@@ -1,9 +1,21 @@
 const api_base_url = import.meta.env.VITE_APP_API_BASE_URL;
-export default async function getFood() {
+export default async function searchCommunityFood(search) {
   try {
-    const response = await fetch(`${api_base_url}/get-community-recipes`);
-    const responseData = await response.json();
-    return { recipes: responseData };
+    if (!search) {
+      const response = await fetch(`${api_base_url}/get-community-recipes`);
+      const responseData = await response.json();
+      return { recipes: responseData };
+    } else {
+      const response = await fetch(
+        `${api_base_url}/search-community-recipes?query=${search}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ search }),
+        }
+      );
+      const responseData = await response.json();
+      return { recipes: responseData };
+    }
   } catch (e) {
     throw new Error();
   }

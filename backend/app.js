@@ -311,6 +311,20 @@ app.get("/get-community-recipes", async (req, res) => {
   }
   return res.status(200).json(recipes);
 });
+app.post("/search-community-recipes", async (req, res) => {
+  const name = req.query.query;
+  const recipes = await Food.find({ title: name }).limit(10).lean();
+
+  for (const recipe of recipes) {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: recipe.imageName,
+    });
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    recipe.image = url;
+  }
+  return res.status(200).json(recipes);
+});
 
 app.post("/get-community-recipe", async (req, res) => {
   const { food } = req.body;

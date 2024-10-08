@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -6,10 +6,16 @@ import { useSearchParams } from "react-router-dom";
 export default function Header() {
   const searchRef = useRef();
   const navigate = useNavigate();
+  const isCommunityRecipes = useMatch("/community-recipes") !== null;
   function handleSearch(event) {
     event.preventDefault();
     const searched = searchRef.current.value;
-    navigate(`/recipes?search=${searched}`);
+
+    navigate(
+      `/${
+        isCommunityRecipes ? "community-recipes" : "recipes"
+      }?search=${searched}`
+    );
   }
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search"));

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import FoodList from "../Components/FoodList";
 import LoadingSpinner from "../Components/LoadingSpinner";
-import getFood from "../util/FoodDb";
+import searchCommunityFood from "../util/FoodDb";
 
 export default function RecipesPage() {
   const [foodList, setFoodList] = useState([]);
@@ -13,7 +13,9 @@ export default function RecipesPage() {
   const search = searchParams.get("search");
   const isRecipes = useMatch("/recipes") !== null;
   const { isFetching, refetch } = useQuery({
-    queryFn: !isRecipes ? () => getFood() : () => searchRecipes(search),
+    queryFn: !isRecipes
+      ? () => searchCommunityFood(search)
+      : () => searchRecipes(search),
     queryKey: [isRecipes, search],
     onSuccess: (data) => {
       if (isRecipes) {
@@ -45,7 +47,7 @@ export default function RecipesPage() {
     content = <FoodList foodList={foodList} />;
   }
 
-  if (isRecipes && !isFetching && foodList.length === 0 && search) {
+  if (!isFetching && foodList.length === 0 && search) {
     content = <p>No results found for &quot;{search}&quot;</p>;
   }
 
