@@ -11,6 +11,6 @@ The application features:
 </ul>
 Hosted on GitHub Pages, you can access the app at the following link:
 
-Recipe App
+<a href = "https://gazhib.github.io/recipe-app/">Recipe App</a>
 
 Backend services are deployed using Heroku, ensuring scalability and performance for managing API requests and user interactions.
