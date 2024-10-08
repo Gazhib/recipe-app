@@ -1,11 +1,10 @@
 /* eslint-disable no-undef */
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const express = require("express");
 const cors = require("cors");
 const { default: mongoose } = require("mongoose");
 const {
   S3Client,
-  AbortMultipartUploadCommand,
   PutObjectCommand,
   GetObjectCommand,
 } = require("@aws-sdk/client-s3");
